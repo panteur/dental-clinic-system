@@ -35,11 +35,7 @@
    }
  ]
 
- const stats = [
-   { value: '15+', label: 'Años de experiencia' },
-   { value: '10.000+', label: 'Pacientes atendidos' },
-   { value: '4.9/5', label: 'Valoración promedio' },
- ]
+// Stats removed per request: no public metrics displayed on landing
 
  export default function HomePage() {
    const [scrolled, setScrolled] = useState(false)
@@ -121,14 +117,7 @@
                  <a href="#servicios" className="inline-block border border-slate-200 text-slate-700 px-6 py-3 rounded-lg hover:bg-slate-50 transition">Ver servicios</a>
                </div>
 
-               <div className="mt-8 grid grid-cols-3 gap-4 max-w-md">
-                 {stats.map((s, i) => (
-                   <div key={i} className="text-center">
-                     <p className="text-2xl font-semibold text-sky-700">{s.value}</p>
-                     <p className="text-xs text-slate-500">{s.label}</p>
-                   </div>
-                 ))}
-               </div>
+                {/* Stats section removed for a cleaner, service-focused landing */}
              </div>
 
              <div className="lg:col-span-6">
