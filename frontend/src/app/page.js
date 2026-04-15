@@ -89,14 +89,12 @@
                <span className="text-lg font-semibold">DentalCare</span>
              </Link>
 
-             <div className="hidden md:flex items-center gap-8">
-               <a href="#servicios" className="text-sm text-slate-600 hover:text-slate-900">Servicios</a>
-               <a href="#nosotros" className="text-sm text-slate-600 hover:text-slate-900">Nosotros</a>
-               <a href="#contacto" className="text-sm text-slate-600 hover:text-slate-900">Contacto</a>
-               <Link href="/appointments" className="inline-flex items-center gap-3 bg-sky-700 hover:bg-sky-800 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition"> 
-                 Agendar cita
-               </Link>
-             </div>
+              <div className="hidden md:flex items-center gap-8">
+                <a href="#servicios" className="text-sm text-slate-600 hover:text-slate-900">Servicios</a>
+                <a href="#nosotros" className="text-sm text-slate-600 hover:text-slate-900">Nosotros</a>
+                <a href="#contacto" className="text-sm text-slate-600 hover:text-slate-900">Contacto</a>
+                <Link href="/appointments" className="btn-primary">Agendar cita</Link>
+              </div>
            </div>
          </div>
        </nav>
@@ -109,22 +107,22 @@
                <p className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-100 text-sky-800 text-sm mb-6">
                  <span className="w-2 h-2 bg-sky-700 rounded-full" /> Disponibilidad esta semana
                </p>
-               <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 leading-tight mb-4">Salud oral profesional, resultados confiables</h1>
+                <h1 className="text-5xl md:text-6xl font-extrabold text-slate-900 leading-tight mb-4">Salud oral profesional, resultados confiables</h1>
                <p className="text-lg text-slate-600 mb-6">Atención integral con especialistas certificados. Tecnología digital y protocolos de esterilización estrictos para tu tranquilidad.</p>
 
-               <div className="flex flex-wrap gap-4">
-                 <Link href="/appointments" className="inline-block bg-sky-700 hover:bg-sky-800 text-white px-6 py-3 rounded-lg font-medium transition">Agendar cita</Link>
-                 <a href="#servicios" className="inline-block border border-slate-200 text-slate-700 px-6 py-3 rounded-lg hover:bg-slate-50 transition">Ver servicios</a>
-               </div>
+                <div className="flex flex-wrap gap-4">
+                  <Link href="/appointments" className="btn-primary">Agendar cita</Link>
+                  <a href="#servicios" className="btn-outline">Ver servicios</a>
+                </div>
 
                 {/* Stats section removed for a cleaner, service-focused landing */}
              </div>
 
-             <div className="lg:col-span-6">
-               <div className="rounded-2xl overflow-hidden shadow-lg border border-slate-100">
-                 <img src="https://images.unsplash.com/photo-1588774069165-8e2f7b0d980b?w=1200&q=80&auto=format&fit=crop" alt="Clínica dental" className="w-full h-72 object-cover md:h-96" />
-               </div>
-             </div>
+              <div className="lg:col-span-6">
+                <div className="rounded-2xl overflow-hidden shadow-lg border border-slate-100 card-media">
+                  <img src="https://images.unsplash.com/photo-1588774069165-8e2f7b0d980b?w=1200&q=80&auto=format&fit=crop" alt="Clínica dental" className="w-full h-72 object-cover md:h-96" />
+                </div>
+              </div>
            </div>
          </div>
        </header>
@@ -137,15 +135,15 @@
              <p className="text-slate-600 mt-2">Tratamientos personalizados con enfoque conservador y estético.</p>
            </div>
 
-           <div className="grid md:grid-cols-3 gap-6">
-             {services.map((svc, i) => (
-               <div key={i} className="bg-white rounded-2xl p-6 border border-slate-50 shadow-sm hover:shadow-md transition">
-                 <div className="w-12 h-12 mb-4 rounded-lg bg-sky-50 text-sky-700 flex items-center justify-center">{svc.icon}</div>
-                 <h3 className="text-lg font-semibold text-slate-900 mb-2">{svc.title}</h3>
-                 <p className="text-slate-600 text-sm">{svc.description}</p>
-               </div>
-             ))}
-           </div>
+            <div className="grid md:grid-cols-3 gap-6">
+              {services.map((svc, i) => (
+                <div key={i} className="card group">
+                  <div className="w-12 h-12 mb-4 rounded-lg bg-sky-50 text-sky-700 flex items-center justify-center group-hover:bg-sky-700 group-hover:text-white transition-colors">{svc.icon}</div>
+                  <h3 className="text-lg font-semibold text-slate-900 mb-2">{svc.title}</h3>
+                  <p className="text-slate-600 text-sm">{svc.description}</p>
+                </div>
+              ))}
+            </div>
          </div>
        </section>
 
@@ -180,9 +178,9 @@
                </ul>
              </div>
              <div className="flex items-center justify-center">
-               <div className="w-full max-w-sm rounded-2xl overflow-hidden shadow-lg">
-                 <img src="https://images.unsplash.com/photo-1616756793889-9b9b0b3f747b?w=800&q=80&auto=format&fit=crop" alt="Equipo dental" className="w-full h-64 object-cover" />
-               </div>
+                <div className="w-full max-w-sm rounded-2xl overflow-hidden shadow-lg card-media">
+                  <img src="https://images.unsplash.com/photo-1616756793889-9b9b0b3f747b?w=800&q=80&auto=format&fit=crop" alt="Equipo dental" className="w-full h-64 object-cover" />
+                </div>
              </div>
            </div>
          </div>

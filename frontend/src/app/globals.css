@@ -11,3 +11,35 @@ html {
 body {
   font-family: 'Inter', system-ui, sans-serif;
 }
+
+:root{
+  --primary: #0369a1; /* sky-700 */
+  --primary-600: #0891b2;
+  --muted: #64748b;
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-lg font-medium transition-transform transform-gpu hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-sky-700/30;
+    @apply bg-sky-700 text-white px-6 py-3 shadow-md hover:bg-sky-800;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center rounded-lg font-medium border border-slate-200 px-6 py-3 transition-colors hover:bg-slate-50;
+    @apply text-slate-700;
+  }
+
+  .card {
+    @apply bg-white rounded-2xl p-6 border border-slate-50 shadow-sm transition-transform transform hover:shadow-lg hover:-translate-y-1;
+  }
+}
+
+/* Image hover scale inside card containers */
+.card-media{ overflow: hidden; }
+.card-media img{ transition: transform 500ms cubic-bezier(.2,.8,.2,1); }
+.card-media:hover img{ transform: scale(1.04); }
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .btn-primary, .card, .card-media img { transition: none !important; transform: none !important; }
+}
