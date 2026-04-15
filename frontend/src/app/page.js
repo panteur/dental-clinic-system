@@ -3,60 +3,49 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'
+
 const services = [
   {
     title: 'Odontología General',
     description: 'Revisiones completas, limpiezas y tratamientos preventivos para mantener tu salud bucal en óptimas condiciones.',
     icon: (
-      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
       </svg>
     ),
-    image: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&h=400&fit=crop'
   },
   {
     title: 'Estética Dental',
-    description: 'Blanqueamiento, carillas y diseño de sonrisa para lograr la apariencia perfecta que siempre has querido.',
+    description: 'Blanqueamiento, carillas y diseño de sonrisa para lograr la apariencia perfecta.',
     icon: (
-      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
       </svg>
     ),
-    image: 'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=600&h=400&fit=crop'
   },
   {
     title: 'Ortodoncia',
-    description: '矫正装置 tradicionales y alineadores transparentes para corregir tu mordida y alinear tu sonrisa.',
+    description: 'Brackets y alineadores transparentes para corregir tu mordida y alinear tu sonrisa.',
     icon: (
-      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
       </svg>
     ),
-    image: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=600&h=400&fit=crop'
-  }
+  },
 ]
 
-const team = [
-  { name: 'Dra. María González', specialty: 'Odontología General', image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=300&h=300&fit=crop&crop=face' },
-  { name: 'Dr. Carlos Rodríguez', specialty: 'Ortodoncia', image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=300&h=300&fit=crop&crop=face' },
-  { name: 'Dra. Ana Martínez', specialty: 'Estética Dental', image: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=300&h=300&fit=crop&crop=face' },
-]
-
-const testimonials = [
-  { name: 'Laura Mendoza', text: 'Mejor experiencia dental que he tenido. El trato es excepcional y los resultados superan mis expectativas.', rating: 5 },
-  { name: 'Roberto Sánchez', text: 'Profesionalismo y calidez en cada visita. Mi familia entera ahora viene aquí.', rating: 5 },
-  { name: 'Carmen López', text: 'El proceso de agendamiento en línea es súper práctico. Definitivamente recomiendo.', rating: 5 },
-]
-
-const certifications = [
-  { name: 'ISO 9001', desc: 'Calidad garantizada' },
-  { name: 'ADA', desc: 'Asociación Dental Americana' },
-  { name: 'Certificación Local', desc: 'Reguladores de salud' },
+const stats = [
+  { value: '15+', label: 'Años de experiencia' },
+  { value: '10K+', label: 'Pacientes atendidos' },
+  { value: '98%', label: 'Satisfacción' },
 ]
 
 export default function HomePage() {
   const [scrolled, setScrolled] = useState(false)
-  const [activeTestimonial, setActiveTestimonial] = useState(0)
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', message: '' })
+  const [formStatus, setFormStatus] = useState({ type: '', message: '' })
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50)
@@ -64,34 +53,52 @@ export default function HomePage() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveTestimonial((prev) => (prev + 1) % testimonials.length)
-    }, 5000)
-    return () => clearInterval(interval)
-  }, [])
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    setFormStatus({ type: '', message: '' })
+    
+    try {
+      const res = await fetch(`${API_URL}/public/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      })
+      
+      if (res.ok) {
+        setFormStatus({ type: 'success', message: '¡Gracias! Te contactaremos pronto.' })
+        setFormData({ name: '', email: '', phone: '', message: '' })
+      } else {
+        setFormStatus({ type: 'error', message: 'Error al enviar. Intenta de nuevo.' })
+      }
+    } catch {
+      setFormStatus({ type: 'error', message: 'Sin conexión. Verifica tu red.' })
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7]">
-      {/* Navbar */}
-      <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-md shadow-sm' : 'bg-transparent'}`}>
+    <div className="min-h-screen bg-[#0a0a0a] text-white">
+      {/* Nav */}
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-[#0a0a0a]/95 backdrop-blur-md border-b border-white/5' : ''}`}>
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex justify-between h-20">
+          <div className="flex justify-between items-center h-20">
             <Link href="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#5B8A72] rounded-full flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-9 h-9 bg-white rounded-lg flex items-center justify-center">
+                <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                 </svg>
               </div>
-              <span className={`text-xl font-medium ${scrolled ? 'text-gray-900' : 'text-gray-800'}`}>DentalCare</span>
+              <span className="text-lg font-medium tracking-tight">DentalCare</span>
             </Link>
-            <div className="hidden md:flex items-center gap-8">
-              <a href="#servicios" className={`text-sm font-medium transition-colors ${scrolled ? 'text-gray-600 hover:text-[#5B8A72]' : 'text-gray-700 hover:text-[#5B8A72]'}`}>Servicios</a>
-              <a href="#equipo" className={`text-sm font-medium transition-colors ${scrolled ? 'text-gray-600 hover:text-[#5B8A72]' : 'text-gray-700 hover:text-[#5B8A72]'}`}>Nuestro Equipo</a>
-              <a href="#testimonios" className={`text-sm font-medium transition-colors ${scrolled ? 'text-gray-600 hover:text-[#5B8A72]' : 'text-gray-700 hover:text-[#5B8A72]'}`}>Testimonios</a>
-              <Link href="/login" className={`text-sm font-medium transition-colors ${scrolled ? 'text-gray-600 hover:text-[#5B8A72]' : 'text-gray-700 hover:text-[#5B8A72]'}`}>Iniciar Sesión</Link>
-              <Link href="/appointments" className="bg-[#5B8A72] hover:bg-[#4a7560] text-white px-5 py-2.5 rounded-full text-sm font-medium transition-colors">
-                Agendar Cita
+            <div className="hidden md:flex items-center gap-10">
+              <a href="#servicios" className="text-sm text-white/60 hover:text-white transition-colors">Servicios</a>
+              <a href="#nosotros" className="text-sm text-white/60 hover:text-white transition-colors">Nosotros</a>
+              <a href="#contacto" className="text-sm text-white/60 hover:text-white transition-colors">Contacto</a>
+              <Link href="/login" className="text-sm text-white/60 hover:text-white transition-colors">Acceder</Link>
+              <Link href="/appointments" className="bg-white text-black px-5 py-2.5 rounded-full text-sm font-medium hover:bg-white/90 transition-colors">
+                Agendar
               </Link>
             </div>
           </div>
@@ -99,46 +106,48 @@ export default function HomePage() {
       </nav>
 
       {/* Hero */}
-      <section className="relative min-h-screen flex items-center">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#E8DDD4]/50 via-[#FDFBF7] to-[#FDFBF7]"></div>
-        <div className="absolute top-20 right-0 w-1/2 h-full bg-[url('https://images.unsplash.com/photo-1629909615184-74f495363b67?w=1200&h=800&fit=crop')] bg-cover bg-center opacity-20 lg:opacity-30"></div>
+      <section className="relative min-h-screen flex items-center pt-20">
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] bg-neutral-800 rounded-full blur-[200px] opacity-20"></div>
+          <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] bg-neutral-700 rounded-full blur-[150px] opacity-10"></div>
+        </div>
         
         <div className="relative max-w-7xl mx-auto px-6 lg:px-8 py-32">
-          <div className="max-w-2xl">
-            <span className="inline-block text-[#5B8A72] text-sm font-medium tracking-wider uppercase mb-4">Bienvenido a DentalCare</span>
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-medium text-gray-900 leading-tight mb-6">
-              Donde tu <span className="text-[#5B8A72]">sonrisa</span> renace
+          <div className="max-w-3xl">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 mb-8">
+              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+              <span className="text-sm text-white/60">Citas disponibles esta semana</span>
+            </div>
+            
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-light tracking-tight mb-6 leading-[1.1]">
+              Excelencia<br />
+              <span className="text-white/40">en cada sonrisa</span>
             </h1>
-            <p className="text-lg md:text-xl text-gray-600 mb-10 leading-relaxed">
-              Experimenta el cuidado dental como nunca antes. Combinamos tecnología de vanguardia con un trato cálido y personalizado para hacerte sentir cómodo en cada visita.
+            
+            <p className="text-lg text-white/50 max-w-xl mb-12 leading-relaxed">
+              Clínica dental con más de 15 años de experiencia. Combinamos tecnología de vanguardia con un trato personalizado para cuidar tu salud bucal.
             </p>
+            
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/appointments" className="bg-[#5B8A72] hover:bg-[#4a7560] text-white px-8 py-4 rounded-full text-base font-medium transition-all hover:shadow-lg">
-                Agenda tu Cita
+              <Link href="/appointments" className="bg-white text-black px-8 py-4 rounded-full text-sm font-medium hover:bg-white/90 transition-all text-center">
+                Agendar cita
               </Link>
-              <a href="#servicios" className="border-2 border-gray-300 text-gray-700 hover:border-[#5B8A72] hover:text-[#5B8A72] px-8 py-4 rounded-full text-base font-medium transition-all">
-                Descubrir Servicios
+              <a href="#servicios" className="border border-white/20 text-white px-8 py-4 rounded-full text-sm font-medium hover:bg-white/5 transition-all text-center">
+                Ver servicios
               </a>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Trust Badges */}
-      <section className="py-12 bg-white border-y border-gray-100">
+      {/* Stats */}
+      <section className="py-20 border-t border-white/5">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16">
-            {certifications.map((cert, i) => (
-              <div key={i} className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-[#E8DDD4] rounded-full flex items-center justify-center">
-                  <svg className="w-5 h-5 text-[#5B8A72]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                  </svg>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-900">{cert.name}</p>
-                  <p className="text-xs text-gray-500">{cert.desc}</p>
-                </div>
+          <div className="grid grid-cols-3 gap-8">
+            {stats.map((stat, i) => (
+              <div key={i} className="text-center">
+                <p className="text-4xl md:text-5xl font-light tracking-tight mb-2">{stat.value}</p>
+                <p className="text-sm text-white/40">{stat.label}</p>
               </div>
             ))}
           </div>
@@ -146,144 +155,208 @@ export default function HomePage() {
       </section>
 
       {/* Services */}
-      <section id="servicios" className="py-24 px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <span className="text-[#5B8A72] text-sm font-medium tracking-wider uppercase">Lo que ofrecemos</span>
-            <h2 className="text-4xl md:text-5xl font-medium text-gray-900 mt-3 mb-4">Nuestros Servicios</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">Cada tratamiento está diseñado para brindarte la mejor experiencia y resultados excepcionales.</p>
+      <section id="servicios" className="py-32 border-t border-white/5">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="max-w-2xl mb-20">
+            <p className="text-sm text-white/40 uppercase tracking-widest mb-4">Servicios</p>
+            <h2 className="text-4xl md:text-5xl font-light tracking-tight">Lo que ofrecemos</h2>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-px bg-white/5">
             {services.map((service, i) => (
-              <div key={i} className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300">
-                <div className="h-48 overflow-hidden">
-                  <img src={service.image} alt={service.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              <div key={i} className="bg-[#0a0a0a] p-10 hover:bg-white/5 transition-colors group">
+                <div className="w-12 h-12 border border-white/10 rounded-xl flex items-center justify-center text-white/60 group-hover:border-white/20 group-hover:text-white transition-colors mb-6">
+                  {service.icon}
                 </div>
-                <div className="p-6">
-                  <div className="w-14 h-14 bg-[#5B8A72]/10 rounded-xl flex items-center justify-center text-[#5B8A72] mb-4">
-                    {service.icon}
-                  </div>
-                  <h3 className="text-xl font-medium text-gray-900 mb-2">{service.title}</h3>
-                  <p className="text-gray-600 leading-relaxed">{service.description}</p>
-                </div>
+                <h3 className="text-xl font-medium mb-3">{service.title}</h3>
+                <p className="text-white/40 leading-relaxed">{service.description}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Team */}
-      <section id="equipo" className="py-24 px-6 lg:px-8 bg-[#E8DDD4]/30">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <span className="text-[#5B8A72] text-sm font-medium tracking-wider uppercase">Conoce a los expertos</span>
-            <h2 className="text-4xl md:text-5xl font-medium text-gray-900 mt-3 mb-4">Nuestro Equipo</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">Profesionales comprometidos con tu bienestar y tu sonrisa.</p>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            {team.map((member, i) => (
-              <div key={i} className="text-center group">
-                <div className="relative w-48 h-48 mx-auto mb-6 rounded-full overflow-hidden ring-4 ring-white shadow-lg">
-                  <img src={member.image} alt={member.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+      {/* About */}
+      <section id="nosotros" className="py-32 border-t border-white/5">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <p className="text-sm text-white/40 uppercase tracking-widest mb-4">Nosotros</p>
+              <h2 className="text-4xl md:text-5xl font-light tracking-tight mb-8 leading-tight">
+                Cuidando sonrisas<br />
+                <span className="text-white/40">desde 2010</span>
+              </h2>
+              <p className="text-white/50 leading-relaxed mb-6">
+                En DentalCare creemos que cada sonrisa es única. Nuestro equipo de profesionales altamente capacitados se compromete a brindarte una experiencia excepcional, combinando técnicas modernas con un trato cálido y personalizado.
+              </p>
+              <p className="text-white/50 leading-relaxed mb-10">
+                Contamos con instalaciones de última generación y-utilizamos materiales de la más alta calidad para garantizar resultados óptimos y duraderos.
+              </p>
+              <div className="flex gap-8">
+                <div>
+                  <p className="text-2xl font-light mb-1">24/7</p>
+                  <p className="text-sm text-white/40">Soporte</p>
                 </div>
-                <h3 className="text-xl font-medium text-gray-900">{member.name}</h3>
-                <p className="text-[#5B8A72]">{member.specialty}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section id="testimonios" className="py-24 px-6 lg:px-8 bg-[#5B8A72]">
-        <div className="max-w-4xl mx-auto text-center">
-          <span className="text-[#C4A77D] text-sm font-medium tracking-wider uppercase">Testimonios</span>
-          <h2 className="text-4xl md:text-5xl font-medium text-white mt-3 mb-12">Lo que dicen nuestros pacientes</h2>
-          
-          <div className="relative min-h-[200px]">
-            {testimonials.map((testimonial, i) => (
-              <div 
-                key={i}
-                className={`absolute inset-0 transition-opacity duration-500 ${i === activeTestimonial ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-              >
-                <div className="flex justify-center mb-4">
-                  {[...Array(testimonial.rating)].map((_, j) => (
-                    <svg key={j} className="w-5 h-5 text-[#C4A77D]" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  ))}
+                <div>
+                  <p className="text-2xl font-light mb-1">5</p>
+                  <p className="text-sm text-white/40">Especialistas</p>
                 </div>
-                <p className="text-xl md:text-2xl text-white/90 italic mb-6 leading-relaxed">"{testimonial.text}"</p>
-                <p className="text-[#C4A77D] font-medium">{testimonial.name}</p>
+                <div>
+                  <p className="text-2xl font-light mb-1">100%</p>
+                  <p className="text-sm text-white/40">Sterilizado</p>
+                </div>
               </div>
-            ))}
-          </div>
-          
-          <div className="flex justify-center gap-2 mt-8">
-            {testimonials.map((_, i) => (
-              <button 
-                key={i}
-                onClick={() => setActiveTestimonial(i)}
-                className={`w-2.5 h-2.5 rounded-full transition-all ${i === activeTestimonial ? 'bg-white w-8' : 'bg-white/40 hover:bg-white/60'}`}
-              />
-            ))}
+            </div>
+            <div className="relative">
+              <div className="aspect-[4/5] bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-2xl overflow-hidden">
+                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=800&h=1000&fit=crop')] bg-cover bg-center opacity-60"></div>
+              </div>
+              <div className="absolute -bottom-6 -left-6 w-48 h-48 bg-neutral-800 rounded-xl -z-10"></div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-24 px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-gradient-to-br from-[#5B8A72] to-[#4a7560] rounded-3xl p-12 md:p-16 text-center relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-            <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2"></div>
-            <div className="relative">
-              <h2 className="text-3xl md:text-4xl font-medium text-white mb-4">Tu primera consulta es gratuita</h2>
-              <p className="text-white/80 mb-8 max-w-lg mx-auto">Agenda tu primera cita sin compromiso y descubre cómo podemos transformar tu sonrisa.</p>
-              <Link href="/appointments" className="inline-block bg-white text-[#5B8A72] hover:bg-gray-100 px-8 py-4 rounded-full text-base font-medium transition-all hover:shadow-lg">
-                Reservar Ahora
+      <section className="py-32 border-t border-white/5">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="bg-neutral-900 rounded-3xl p-12 md:p-20 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl"></div>
+            <div className="relative max-w-2xl">
+              <h2 className="text-4xl md:text-5xl font-light tracking-tight mb-6">Primera consulta<br /><span className="text-white/40">gratuita</span></h2>
+              <p className="text-white/50 mb-10 max-w-lg">
+                Agenda tu primera visita sin compromiso. Conoceremos tus necesidades y te explicaremos las mejores opciones para tu caso.
+              </p>
+              <Link href="/appointments" className="inline-block bg-white text-black px-8 py-4 rounded-full text-sm font-medium hover:bg-white/90 transition-all">
+                Reservar ahora
               </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-gray-400 py-16 px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-12 mb-12">
-            <div className="md:col-span-2">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-[#5B8A72] rounded-full flex items-center justify-center">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                  </svg>
+      {/* Contact */}
+      <section id="contacto" className="py-32 border-t border-white/5">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-16">
+            <div>
+              <p className="text-sm text-white/40 uppercase tracking-widest mb-4">Contacto</p>
+              <h2 className="text-4xl md:text-5xl font-light tracking-tight mb-8">Hablemos</h2>
+              <p className="text-white/50 mb-12 max-w-md">
+                ¿Tienes preguntas o quieres agendar una cita? Estamos aquí para ayudarte.
+              </p>
+              <div className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 bg-neutral-800 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-sm text-white/40">Teléfono</p>
+                    <p className="text-white">+52 55 1234 5678</p>
+                  </div>
                 </div>
-                <span className="text-xl font-medium text-white">DentalCare</span>
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 bg-neutral-800 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-sm text-white/40">Email</p>
+                    <p className="text-white">contacto@dentalcare.com</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 bg-neutral-800 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-sm text-white/40">Ubicación</p>
+                    <p className="text-white">Av. Reforma 500, CDMX</p>
+                  </div>
+                </div>
               </div>
-              <p className="text-sm leading-relaxed max-w-md">Cuidando sonrisas desde 2010. Nuestro compromiso es brindarte la mejor experiencia dental con un equipo apasionado y tecnología de vanguardia.</p>
             </div>
+            
             <div>
-              <h4 className="text-white font-medium mb-4">Horario</h4>
-              <ul className="space-y-2 text-sm">
-                <li>Lunes - Viernes: 9:00 - 19:00</li>
-                <li>Sábados: 9:00 - 14:00</li>
-                <li>Domingos: Cerrado</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-medium mb-4">Contacto</h4>
-              <ul className="space-y-2 text-sm">
-                <li>+52 55 1234 5678</li>
-                <li>contacto@dentalcare.com</li>
-                <li>Av. Reforma 500, CDMX</li>
-              </ul>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                  <input
+                    type="text"
+                    required
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full bg-neutral-900 border border-white/10 rounded-xl px-5 py-4 text-white placeholder-white/30 focus:border-white/30 focus:outline-none transition-colors"
+                    placeholder="Nombre"
+                  />
+                </div>
+                <div>
+                  <input
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full bg-neutral-900 border border-white/10 rounded-xl px-5 py-4 text-white placeholder-white/30 focus:border-white/30 focus:outline-none transition-colors"
+                    placeholder="Email"
+                  />
+                </div>
+                <div>
+                  <input
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    className="w-full bg-neutral-900 border border-white/10 rounded-xl px-5 py-4 text-white placeholder-white/30 focus:border-white/30 focus:outline-none transition-colors"
+                    placeholder="Teléfono"
+                  />
+                </div>
+                <div>
+                  <textarea
+                    required
+                    rows={4}
+                    value={formData.message}
+                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                    className="w-full bg-neutral-900 border border-white/10 rounded-xl px-5 py-4 text-white placeholder-white/30 focus:border-white/30 focus:outline-none transition-colors resize-none"
+                    placeholder="Mensaje"
+                  />
+                </div>
+                
+                {formStatus.message && (
+                  <div className={`p-4 rounded-xl ${formStatus.type === 'success' ? 'bg-green-900/30 text-green-400' : 'bg-red-900/30 text-red-400'}`}>
+                    {formStatus.message}
+                  </div>
+                )}
+                
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-white text-black py-4 rounded-xl font-medium hover:bg-white/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? 'Enviando...' : 'Enviar mensaje'}
+                </button>
+              </form>
             </div>
           </div>
-          <div className="border-t border-gray-800 pt-8 text-center text-sm">
-            <p>© 2024 DentalCare. Todos los derechos reservados.</p>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-white/5 py-12">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
+                <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+              </div>
+              <span className="text-sm">DentalCare</span>
+            </div>
+            <p className="text-sm text-white/30">© 2024 DentalCare. Todos los derechos reservados.</p>
           </div>
         </div>
       </footer>

@@ -8,6 +8,28 @@ const { validate } = require('../middleware/validate.middleware');
 
 const router = express.Router();
 
+router.post('/contact',
+  validate([
+    body('name').trim().notEmpty().withMessage('El nombre es requerido'),
+    body('email').isEmail().withMessage('Email inválido'),
+    body('message').trim().notEmpty().withMessage('El mensaje es requerido')
+  ]),
+  async (req, res, next) => {
+    try {
+      const { name, email, phone, message } = req.body;
+      
+      console.log('Contacto recibido:', { name, email, phone, message });
+      
+      res.status(201).json({
+        message: 'Mensaje recibido correctamente',
+        success: true
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 router.post('/register',
   validate([
     body('dni').trim().notEmpty(),
