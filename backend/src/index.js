@@ -10,6 +10,7 @@ const patientRoutes = require('./routes/patient.routes');
 const appointmentRoutes = require('./routes/appointment.routes');
 const serviceRoutes = require('./routes/service.routes');
 const scheduleRoutes = require('./routes/schedule.routes');
+const publicRoutes = require('./routes/public.routes');
 const { errorHandler } = require('./middleware/error.middleware');
 const { notFoundHandler } = require('./middleware/notFound.middleware');
 
@@ -29,6 +30,7 @@ app.use('/api/patients', patientRoutes);
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/schedules', scheduleRoutes);
+app.use('/api/public', publicRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
