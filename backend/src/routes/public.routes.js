@@ -5,6 +5,7 @@ const Appointment = require('../models/appointment.model');
 const { APPOINTMENT_TYPES } = require('../config/constants');
 const { AppError } = require('../middleware/error.middleware');
 const { validate } = require('../middleware/validate.middleware');
+const emailService = require('../services/email.service');
 
 const router = express.Router();
 
@@ -109,6 +110,8 @@ router.post('/appointment',
       });
 
       const appointment = await Appointment.findById(appointmentId);
+
+      emailService.sendAppointmentConfirmation(appointment, patient);
 
       res.status(201).json({
         message: 'Cita agendada exitosamente',

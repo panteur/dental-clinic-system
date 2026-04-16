@@ -1,6 +1,7 @@
 const Appointment = require('../models/appointment.model');
 const { STATUS, APPOINTMENT_TYPES } = require('../config/constants');
 const { AppError } = require('../middleware/error.middleware');
+const emailService = require('../services/email.service');
 
 class AppointmentController {
   static async getAll(req, res, next) {
@@ -82,6 +83,11 @@ class AppointmentController {
 
       await Appointment.update(req.params.id, req.body);
       const updatedAppointment = await Appointment.findById(req.params.id);
+
+      if (req.body.date || req.body.time) {
+        emailService.sendAppointmentReschedule(updatedAppointment, updatedAppointment);
+      }
+
       res.json({ message: 'Cita actualizada', appointment: updatedAppointment });
     } catch (error) {
       next(error);
@@ -104,6 +110,11 @@ class AppointmentController {
 
       await Appointment.updateStatus(req.params.id, status);
       const updatedAppointment = await Appointment.findById(req.params.id);
+
+      if (status === STATUS.CANCELLED) {
+        emailService.sendAppointmentCancellation(updatedAppointment, updatedAppointment);
+      }
+
       res.json({ message: 'Estado actualizado', appointment: updatedAppointment });
     } catch (error) {
       next(error);
