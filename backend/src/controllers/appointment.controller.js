@@ -128,11 +128,15 @@ class AppointmentController {
     try {
       const { dentist_id, start_date, end_date } = req.query;
       
-      if (!dentist_id || !start_date || !end_date) {
-        throw new AppError('Se requiere dentist_id, start_date y end_date', 400);
+      if (!start_date || !end_date) {
+        throw new AppError('Se requiere start_date y end_date', 400);
       }
 
-      const appointments = await Appointment.getByDateRange({ dentist_id, start_date, end_date });
+      const appointments = await Appointment.getByDateRange({ 
+        dentist_id: dentist_id || null, 
+        start_date, 
+        end_date 
+      });
       res.json({ appointments });
     } catch (error) {
       next(error);
