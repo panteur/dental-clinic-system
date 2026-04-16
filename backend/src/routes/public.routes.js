@@ -80,6 +80,13 @@ router.post('/appointment',
     try {
       const { dni, name, last_name, email, phone, dentist_id, service_id, date, time, notes } = req.body;
 
+      const Service = require('../models/service.model');
+      const service = await Service.findById(service_id);
+      if (!service) {
+        throw new AppError('Servicio no encontrado', 404);
+      }
+      const serviceDuration = service.duration || 30;
+
       let patient = await Patient.findByDni(dni);
       
       if (!patient) {
@@ -93,7 +100,7 @@ router.post('/appointment',
         patient = await Patient.findById(patientId);
       }
 
-      const isAvailable = await Appointment.checkAvailability(dentist_id, date, time);
+      const isAvailable = await Appointment.checkAvailability(dentist_id, date, time, serviceDuration);
       if (!isAvailable) {
         throw new AppError('El horario seleccionado no está disponible', 400);
       }
@@ -104,7 +111,7 @@ router.post('/appointment',
         service_id,
         date,
         time,
-        duration: 30,
+        duration: serviceDuration,
         type: APPOINTMENT_TYPES.NEW,
         notes: notes || null
       });

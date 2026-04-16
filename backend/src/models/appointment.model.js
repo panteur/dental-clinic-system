@@ -119,17 +119,34 @@ class Appointment {
     return result.affectedRows > 0;
   }
 
-  static async checkAvailability(dentistId, date, time, excludeId = null) {
-    let sql = `SELECT id FROM appointments WHERE dentist_id = ? AND date = ? AND time = ? AND status != ?`;
-    const params = [dentistId, date, time, STATUS.CANCELLED];
+  static async checkAvailability(dentistId, date, time, serviceDuration = 30, excludeId = null) {
+    const [h, m] = time.split(':').map(Number);
+    const newStart = h * 60 + m;
+    const newEnd = newStart + serviceDuration;
+
+    let sql = `SELECT id, time, duration FROM appointments WHERE dentist_id = ? AND date = ? AND status != ?`;
+    const params = [dentistId, date, STATUS.CANCELLED];
 
     if (excludeId) {
       sql += ' AND id != ?';
       params.push(excludeId);
     }
 
-    const appointments = await query(sql, params);
-    return appointments.length === 0;
+    const existingAppointments = await query(sql, params);
+
+    for (const apt of existingAppointments) {
+
+      const [ah, am] = apt.time.split(':').map(Number);
+      const aptStart = ah * 60 + am;
+      const aptDuration = apt.duration || 30;
+      const aptEnd = aptStart + aptDuration;
+
+      if (newStart < aptEnd && newEnd > aptStart) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   static async getByDateRange(filters = {}) {

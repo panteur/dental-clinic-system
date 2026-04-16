@@ -38,7 +38,11 @@ class AppointmentController {
     try {
       const { patient_id, dentist_id, service_id, date, time, duration, type, notes } = req.body;
 
-      const isAvailable = await Appointment.checkAvailability(dentist_id, date, time);
+      const Service = require('../models/service.model');
+      const service = await Service.findById(service_id);
+      const serviceDuration = duration || (service?.duration || 30);
+
+      const isAvailable = await Appointment.checkAvailability(dentist_id, date, time, serviceDuration);
       if (!isAvailable) {
         throw new AppError('El horario no está disponible', 400);
       }
@@ -49,12 +53,13 @@ class AppointmentController {
         service_id,
         date,
         time,
-        duration,
+        duration: serviceDuration,
         type: type || APPOINTMENT_TYPES.NEW,
         notes
       });
 
       const appointment = await Appointment.findById(appointmentId);
+      emailService.sendAppointmentConfirmation(appointment, appointment);
       res.status(201).json({ message: 'Cita creada', appointment });
     } catch (error) {
       next(error);
