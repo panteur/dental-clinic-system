@@ -16,7 +16,13 @@ const { notFoundHandler } = require('./middleware/notFound.middleware');
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'http://192.168.1.10:3000'
+  ],
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

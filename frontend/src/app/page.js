@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.1.10:4000/api'
 
 /* ─── useInView hook ─── */
 function useInView(options = {}) {
