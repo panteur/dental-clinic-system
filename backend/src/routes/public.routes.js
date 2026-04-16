@@ -144,7 +144,7 @@ router.get('/dentists', async (req, res, next) => {
 
 router.get('/slots', async (req, res, next) => {
   try {
-    const { dentist_id, date } = req.query;
+    const { dentist_id, date, service_id } = req.query;
     
     if (!dentist_id || !date) {
       throw new AppError('Se requiere dentist_id y date', 400);
@@ -152,13 +152,33 @@ router.get('/slots', async (req, res, next) => {
 
     const Schedule = require('../models/schedule.model');
     const Appointment = require('../models/appointment.model');
+    const Service = require('../models/service.model');
+    
+    const serviceDuration = service_id ? (await Service.findById(parseInt(service_id))?.duration || 30) : 30;
+    const slotInterval = 30;
     
     const dayOfWeek = new Date(date).getDay();
     const schedule = await Schedule.findByDay(parseInt(dentist_id), dayOfWeek);
     
     if (!schedule) {
-      return res.json({ slots: [], message: 'El dentista no atende este día' });
+      return res.json({ slots: [], bookedSlots: [], message: 'El dentista no atiende este día' });
     }
+
+    const today = new Date().toISOString().split('T')[0];
+    const isToday = date === today;
+    const now = new Date();
+    
+    const existingAppointments = await Appointment.findAll({ 
+      dentist_id: parseInt(dentist_id), 
+      date 
+    });
+    
+    const bookedSlots = existingAppointments
+      .filter(a => a.status !== 'cancelada')
+      .map(a => {
+        const [h, m] = a.time.split(':').map(Number);
+        return { time: `${h}:${m.toString().padStart(2, '0')}`, duration: a.service_duration || 30 };
+      });
 
     const slots = [];
     const startTime = schedule.start_time.split(':').map(Number);
@@ -178,25 +198,51 @@ router.get('/slots', async (req, res, next) => {
       if (!isBreak) {
         const timeStr = `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`;
         
-        const isAvailable = await Appointment.checkAvailability(
-          parseInt(dentist_id), 
-          date, 
-          timeStr
-        );
+        if (isToday) {
+          const slotHour = currentHour;
+          const slotMinute = currentMinute;
+          const slotDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), slotHour, slotMinute);
+          if (slotDate <= now) {
+            currentMinute += slotInterval;
+            if (currentMinute >= 60) { currentMinute = 0; currentHour++; }
+            continue;
+          }
+        }
+
+        const slotEnd = currentMinute + serviceDuration;
+        const slotEndHour = currentHour + Math.floor(slotEnd / 60);
+        const slotEndMinute = slotEnd % 60;
         
-        if (isAvailable) {
+        const schedEndMinutes = endTime[0] * 60 + endTime[1];
+        const slotEndMinutes = slotEndHour * 60 + slotEndMinute;
+        if (slotEndMinutes > schedEndMinutes) {
+          currentMinute += slotInterval;
+          if (currentMinute >= 60) { currentMinute = 0; currentHour++; }
+          continue;
+        }
+
+        const overlaps = bookedSlots.some(booked => {
+          const [bh, bm] = booked.time.split(':').map(Number);
+          const bookedStart = bh * 60 + bm;
+          const bookedEnd = bookedStart + booked.duration;
+          const currentStart = currentHour * 60 + currentMinute;
+          const currentEnd = currentStart + serviceDuration;
+          return currentStart < bookedEnd && currentEnd > bookedStart;
+        });
+
+        if (!overlaps) {
           slots.push(timeStr);
         }
       }
 
-      currentMinute += 30;
+      currentMinute += slotInterval;
       if (currentMinute >= 60) {
         currentMinute = 0;
         currentHour++;
       }
     }
 
-    res.json({ slots, schedule });
+    res.json({ slots, bookedSlots, schedule, serviceDuration });
   } catch (error) {
     next(error);
   }

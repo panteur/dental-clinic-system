@@ -132,16 +132,31 @@ class Appointment {
     return appointments.length === 0;
   }
 
-  static async getByDateRange(dentistId, startDate, endDate) {
-    return query(
-      `SELECT a.*, p.name as patient_name, s.name as service_name
-       FROM appointments a
-       LEFT JOIN patients p ON a.patient_id = p.id
-       LEFT JOIN services s ON a.service_id = s.id
-       WHERE a.dentist_id = ? AND a.date BETWEEN ? AND ? AND a.status != ?
-       ORDER BY a.date, a.time`,
-      [dentistId, startDate, endDate, STATUS.CANCELLED]
-    );
+  static async getByDateRange(filters = {}) {
+    let sql = `SELECT a.*,
+                      p.name as patient_name, p.last_name as patient_last_name,
+                      u.name as dentist_name, u.specialty as dentist_specialty,
+                      s.name as service_name
+               FROM appointments a
+               LEFT JOIN patients p ON a.patient_id = p.id
+               LEFT JOIN users u ON a.dentist_id = u.id
+               LEFT JOIN services s ON a.service_id = s.id
+               WHERE 1=1`;
+    const params = [];
+
+    if (filters.dentist_id) {
+      sql += ' AND a.dentist_id = ?';
+      params.push(filters.dentist_id);
+    }
+
+    sql += ' AND a.date >= CAST(? AS DATE) AND a.date <= CAST(? AS DATE)';
+    params.push(filters.start_date, filters.end_date);
+
+    sql += ' AND a.status != ?';
+    params.push(STATUS.CANCELLED);
+
+    sql += ' ORDER BY a.date ASC, a.time ASC';
+    return query(sql, params);
   }
 
   static async getStats(filters = {}) {

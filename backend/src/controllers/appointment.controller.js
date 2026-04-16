@@ -132,7 +132,7 @@ class AppointmentController {
         throw new AppError('Se requiere dentist_id, start_date y end_date', 400);
       }
 
-      const appointments = await Appointment.getByDateRange(dentist_id, start_date, end_date);
+      const appointments = await Appointment.getByDateRange({ dentist_id, start_date, end_date });
       res.json({ appointments });
     } catch (error) {
       next(error);
