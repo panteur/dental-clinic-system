@@ -89,6 +89,31 @@ class User {
   static async comparePassword(plainPassword, hashedPassword) {
     return bcrypt.compare(plainPassword, hashedPassword);
   }
+
+  static async setResetToken(email, token) {
+    const expires = new Date(Date.now() + 15 * 60 * 1000);
+    await query(
+      'UPDATE users SET reset_token = ?, reset_expires = ? WHERE email = ?',
+      [token, expires, email]
+    );
+  }
+
+  static async findByResetToken(token) {
+    const users = await query(
+      'SELECT * FROM users WHERE reset_token = ? AND reset_expires > NOW()',
+      [token]
+    );
+    return users[0] || null;
+  }
+
+  static async updatePassword(id, newPassword) {
+    const hashed = await bcrypt.hash(newPassword, 10);
+    const result = await query(
+      'UPDATE users SET password = ?, reset_token = NULL, reset_expires = NULL WHERE id = ?',
+      [hashed, id]
+    );
+    return result.affectedRows > 0;
+  }
 }
 
 module.exports = User;

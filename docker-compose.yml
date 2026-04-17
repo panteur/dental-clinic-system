@@ -38,6 +38,7 @@ services:
       SMTP_USER: sservex@gmail.com
       SMTP_PASS: vxpvrjpmomawoddl
       CLINIC_PHONE: "+56948139501"
+      FRONTEND_URL: "http://192.168.1.10:3000"
     ports:
       - "4000:4000"
     depends_on:

@@ -144,6 +144,15 @@ const seedData = [
       INSERT IGNORE INTO users (id, email, password, name, role, phone, specialty) VALUES
       (1, 'admin@dentalclinic.com', '$2a$10$8K1p/a0dR1xqM8K3yZQz5eFHpM9QvN5xGqJdKmL8vR2sW3yB0uHmO', 'Administrador', 'admin', '1234567890', NULL);
     `
+  },
+  {
+    name: 'add_reset_token_columns',
+    sql: `
+      ALTER TABLE users
+      ADD COLUMN reset_token VARCHAR(255) NULL,
+      ADD COLUMN reset_expires DATETIME NULL,
+      ADD INDEX idx_reset_token (reset_token);
+    `
   }
 ];
 

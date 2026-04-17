@@ -188,4 +188,76 @@ async function sendAppointmentReschedule(appointment, patient) {
   await sendEmail(patient.email, subject, html);
 }
 
-module.exports = { sendAppointmentConfirmation, sendAppointmentCancellation, sendAppointmentReschedule };
+async function sendPasswordResetEmail(user, token, resetUrl) {
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    console.log(`[Email] SMTP no configurado. Reset para ${user.email}: ${resetUrl}`);
+    return;
+  }
+
+  if (!user?.email) return;
+
+  const subject = `Recuperar contraseña - ${CLINIC_NAME}`;
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1a1a2e;">
+      <div style="background: #0f4c75; padding: 24px; text-align: center;">
+        <h1 style="color: white; margin: 0; font-size: 24px;">${CLINIC_NAME}</h1>
+        <p style="color: #bbe1fa; margin: 4px 0 0;">Recuperación de contraseña</p>
+      </div>
+      <div style="padding: 32px 24px;">
+        <p style="font-size: 16px;">Hola <strong>${user.name}</strong>,</p>
+        <p style="font-size: 16px;">Recibimos una solicitud para restablecer la contraseña de tu cuenta.</p>
+        <p style="font-size: 14px; color: #666;">Haz clic en el siguiente botón para crear una nueva contraseña. Este enlace expira en <strong>15 minutos</strong>.</p>
+        
+        <div style="text-align: center; margin: 32px 0;">
+          <a href="${resetUrl}" style="background: #0f4c75; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">Restablecer contraseña</a>
+        </div>
+        
+        <p style="font-size: 13px; color: #999; text-align: center;">Si no solicitaste este cambio, puedes ignorar este email. Tu contraseña actual seguirá siendo válida.</p>
+        <p style="font-size: 13px; color: #999; text-align: center; margin-top: 8px;">Este enlace expira en 15 minutos.</p>
+      </div>
+      <div style="background: #f1f1f1; padding: 16px 24px; text-align: center; font-size: 12px; color: #999;">
+        ${CLINIC_NAME} · ${CLINIC_PHONE} · ${CLINIC_EMAIL}
+      </div>
+    </div>
+  `;
+
+  await sendEmail(user.email, subject, html);
+}
+
+async function sendPasswordChangedEmail(user) {
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    console.log(`[Email] SMTP no configurado. Confirmación de cambio de contraseña para ${user.email}`);
+    return;
+  }
+
+  if (!user?.email) return;
+
+  const subject = `Contraseña actualizada - ${CLINIC_NAME}`;
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1a1a2e;">
+      <div style="background: #27ae60; padding: 24px; text-align: center;">
+        <h1 style="color: white; margin: 0; font-size: 24px;">${CLINIC_NAME}</h1>
+        <p style="color: #d5f5e3; margin: 4px 0 0;">Contraseña actualizada</p>
+      </div>
+      <div style="padding: 32px 24px;">
+        <p style="font-size: 16px;">Hola <strong>${user.name}</strong>,</p>
+        <p style="font-size: 16px;">Tu contraseña ha sido cambiada exitosamente.</p>
+        <p style="font-size: 14px; color: #666;">Si fuiste tú quien realizó este cambio, no necesitas hacer nada más.</p>
+        <p style="font-size: 14px; color: #666; margin-top: 16px;">Si no fuiste tú, contacta inmediatamente a <strong>${CLINIC_PHONE}</strong>.</p>
+      </div>
+      <div style="background: #f1f1f1; padding: 16px 24px; text-align: center; font-size: 12px; color: #999;">
+        ${CLINIC_NAME} · ${CLINIC_PHONE} · ${CLINIC_EMAIL}
+      </div>
+    </div>
+  `;
+
+  await sendEmail(user.email, subject, html);
+}
+
+module.exports = {
+  sendAppointmentConfirmation,
+  sendAppointmentCancellation,
+  sendAppointmentReschedule,
+  sendPasswordResetEmail,
+  sendPasswordChangedEmail
+};

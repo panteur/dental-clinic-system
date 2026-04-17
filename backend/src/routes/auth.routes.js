@@ -35,4 +35,20 @@ router.post('/change-password',
   AuthController.changePassword
 );
 
+router.post('/forgot-password',
+  validate([
+    body('email').isEmail().normalizeEmail()
+  ]),
+  AuthController.forgotPassword
+);
+
+router.post('/reset-password',
+  validate([
+    body('token').notEmpty(),
+    body('password').isLength({ min: 6 }),
+    body('confirmPassword').notEmpty()
+  ]),
+  AuthController.resetPassword
+);
+
 module.exports = router;
