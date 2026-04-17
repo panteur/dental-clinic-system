@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/context/AuthContext'
+import { formatRut, validateRut, cleanRut } from '@/utils/rut'
 
 export default function UsersPage() {
   const { api, user } = useAuth()
@@ -20,6 +21,7 @@ export default function UsersPage() {
     specialty: ''
   })
   const [search, setSearch] = useState('')
+  const [rutError, setRutError] = useState('')
 
   const isAdmin = user?.role === 'admin'
 
@@ -46,12 +48,6 @@ export default function UsersPage() {
     return () => clearTimeout(timer)
   }, [search])
 
-  const openCreateModal = () => {
-    setEditingUser(null)
-    setFormData({ rut: '', name: '', email: '', password: '', role: 'dentista', phone: '', specialty: '' })
-    setShowModal(true)
-  }
-
   const openEditModal = (userData) => {
     setEditingUser(userData)
     setFormData({
@@ -63,13 +59,47 @@ export default function UsersPage() {
       phone: userData.phone || '',
       specialty: userData.specialty || ''
     })
+    setRutError('')
     setShowModal(true)
+  }
+
+  const openCreateModal = () => {
+    setEditingUser(null)
+    setFormData({ rut: '', name: '', email: '', password: '', role: 'dentista', phone: '', specialty: '' })
+    setRutError('')
+    setShowModal(true)
+  }
+
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    if (name === 'rut') {
+      const cleaned = cleanRut(value)
+      const formatted = formatRut(cleaned)
+      setFormData({ ...formData, rut: formatted })
+      if (cleaned.length >= 2) {
+        if (!validateRut(formatted)) {
+          setRutError('RUT inválido')
+        } else {
+          setRutError('')
+        }
+      } else {
+        setRutError('')
+      }
+    } else {
+      setFormData({ ...formData, [name]: value })
+    }
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setSaving(true)
     try {
+      if (formData.rut && !validateRut(formData.rut)) {
+        setRutError('RUT inválido')
+        setSaving(false)
+        return
+      }
+
       const data = {
         rut: formData.rut || null,
         name: formData.name,
@@ -266,11 +296,13 @@ export default function UsersPage() {
                 </label>
                 <input
                   type="text"
+                  name="rut"
                   value={formData.rut}
-                  onChange={(e) => setFormData({ ...formData, rut: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  onChange={handleChange}
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 outline-none ${rutError ? 'border-red-400 focus:ring-red-500' : 'border-gray-300'}`}
                   placeholder="Ej: 12.345.678-5"
                 />
+                {rutError && <p className="text-red-500 text-xs mt-1">{rutError}</p>}
               </div>
 
               <div>
@@ -279,10 +311,11 @@ export default function UsersPage() {
                 </label>
                 <input
                   type="text"
+                  name="name"
                   required
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
                   placeholder="Dr. Juan García"
                 />
               </div>
@@ -293,10 +326,11 @@ export default function UsersPage() {
                 </label>
                 <input
                   type="email"
+                  name="email"
                   required
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
                   placeholder="juan@clinicadental.com"
                 />
               </div>
@@ -307,10 +341,11 @@ export default function UsersPage() {
                 </label>
                 <input
                   type="password"
+                  name="password"
                   required={!editingUser}
                   value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
                   placeholder={editingUser ? '••••••••' : 'Mínimo 6 caracteres'}
                 />
               </div>
@@ -320,10 +355,11 @@ export default function UsersPage() {
                   Rol *
                 </label>
                 <select
+                  name="role"
                   required
                   value={formData.role}
-                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
                 >
                   <option value="dentista">Dentista</option>
                   <option value="recepcionista">Recepcionista</option>
@@ -337,9 +373,10 @@ export default function UsersPage() {
                 </label>
                 <input
                   type="tel"
+                  name="phone"
                   value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
                   placeholder="+56 9 1234 5678"
                 />
               </div>
@@ -351,9 +388,10 @@ export default function UsersPage() {
                   </label>
                   <input
                     type="text"
+                    name="specialty"
                     value={formData.specialty}
-                    onChange={(e) => setFormData({ ...formData, specialty: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
                     placeholder="Ej: Ortodoncia, Endodoncia"
                   />
                 </div>

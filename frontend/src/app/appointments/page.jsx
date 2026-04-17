@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext'
 import Link from 'next/link'
 import { format, addDays, isToday } from 'date-fns'
 import { es } from 'date-fns/locale'
+import { formatRut, validateRut, cleanRut } from '@/utils/rut'
 
 export default function AppointmentPage() {
   const { api } = useAuth()
@@ -32,6 +33,7 @@ export default function AppointmentPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [rutError, setRutError] = useState('')
 
   useEffect(() => {
     loadInitialData()
@@ -84,13 +86,35 @@ export default function AppointmentPage() {
   }
 
   const handlePatientChange = (e) => {
-    setPatientData({ ...patientData, [e.target.name]: e.target.value })
+    const { name, value } = e.target
+    if (name === 'dni') {
+      const cleaned = cleanRut(value)
+      const formatted = formatRut(cleaned)
+      setPatientData({ ...patientData, dni: formatted })
+      if (cleaned.length >= 2) {
+        if (!validateRut(formatted)) {
+          setRutError('RUN inválido')
+        } else {
+          setRutError('')
+        }
+      } else {
+        setRutError('')
+      }
+    } else {
+      setPatientData({ ...patientData, [name]: value })
+    }
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
     setSubmitting(true)
+
+    if (patientData.dni && !validateRut(patientData.dni)) {
+      setRutError('RUN inválido')
+      setSubmitting(false)
+      return
+    }
 
     try {
       const dateStr = format(selectedDate, 'yyyy-MM-dd')
@@ -477,8 +501,9 @@ export default function AppointmentPage() {
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 mb-1.5">RUN / Identificación</label>
                     <input type="text" name="dni" value={patientData.dni} onChange={handlePatientChange}
-                      className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-colors outline-none"
+                      className={`w-full border rounded-xl px-4 py-3 text-sm transition-colors outline-none ${rutError ? 'border-red-400 focus:ring-2 focus:ring-red-500/20 focus:border-red-500' : 'border-slate-200 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500'}`}
                       placeholder="Ej. 12.345.678-9" />
+                    {rutError && <p className="text-red-500 text-xs mt-1">{rutError}</p>}
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 mb-1.5">Teléfono *</label>
