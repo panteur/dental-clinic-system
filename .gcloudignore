@@ -1,0 +1,6 @@
+# Ignore these files in cloud build
+.git
+node_modules
+*.md
+.env.local
+.env.*.local

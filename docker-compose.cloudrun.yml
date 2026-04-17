@@ -1,0 +1,29 @@
+# Cloud Run Production - Backend
+# This file is used for deployment to Google Cloud Run
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=production
+      - PORT=4000
+      - DB_HOST=/cloudsql/PROJECT_ID:REGION:INSTANCE_NAME
+      - DB_PORT=3306
+      - DB_NAME=dental_clinic
+      - DB_USER=root
+      - DB_PASSWORD=${DB_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRES_IN=7d
+      - SMTP_HOST=smtp.gmail.com
+      - SMTP_PORT=587
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - CLINIC_PHONE=+56948139501
+      - FRONTEND_URL=${FRONTEND_URL}
+    # For Cloud SQL Auth Proxy (local development)
+    # volumes:
+    #   - /cloudsql:/cloudsql
