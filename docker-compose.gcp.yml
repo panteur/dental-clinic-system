@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=production
+      - PORT=4000
+      - DB_HOST=sql10.freesqldatabase.com
+      - DB_PORT=3306
+      - DB_NAME=sql10823552
+      - DB_USER=sql10823552
+      - DB_PASSWORD=dTDgbmznFz
+      - JWT_SECRET=clinica-dental-secreto-2024
+      - JWT_EXPIRES_IN=7d
+      - SMTP_HOST=smtp.gmail.com
+      - SMTP_PORT=587
+      - SMTP_USER=sservex@gmail.com
+      - SMTP_PASS=vxpvrjpmomawoddl
+      - CLINIC_PHONE=+56948139501
+      - FRONTEND_URL=frontend-url-placeholder
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL=https://api-placeholder.a.run.app/api
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=https://api-placeholder.a.run.app/api
+    restart: unless-stopped
