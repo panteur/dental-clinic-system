@@ -48,15 +48,18 @@ function RescheduleModal({ apt, onClose, onSave, api }) {
 
   const dates = Array.from({ length: 14 }, (_, i) => addDays(new Date(), i)).filter(d => d.getDay() !== 0)
 
-  const loadSlots = async () => {
+  const loadSlots = async (date) => {
     setLoadingSlots(true)
     setSelectedTime(null)
     setAvailableSlots([])
     try {
-      const dateStr = format(selectedDate, 'yyyy-MM-dd')
-      const res = await api.get(`/public/slots?dentist_id=${apt.dentist_id}&date=${dateStr}&service_id=${apt.service_id}`)
+      const dateStr = format(date, 'yyyy-MM-dd')
+      const serviceId = apt.service_id || ''
+      const url = `/public/slots?dentist_id=${apt.dentist_id}&date=${dateStr}${serviceId ? `&service_id=${serviceId}` : ''}`
+      const res = await api.get(url)
       setAvailableSlots(res.data.slots || [])
-    } catch {
+    } catch (err) {
+      console.error('Error loading slots:', err)
       setAvailableSlots([])
     }
     setLoadingSlots(false)
@@ -64,7 +67,7 @@ function RescheduleModal({ apt, onClose, onSave, api }) {
 
   const handleDateSelect = (date) => {
     setSelectedDate(date)
-    loadSlots()
+    loadSlots(date)
   }
 
   const handleSave = async () => {
