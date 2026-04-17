@@ -566,7 +566,7 @@ export default function HomePage() {
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-colors outline-none"
-                    placeholder="+52 55 0000 0000"
+                    placeholder="+56 9 0000 0000"
                   />
                 </div>
                 <div>
