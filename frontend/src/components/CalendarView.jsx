@@ -86,7 +86,7 @@ export default function CalendarView({ onAppointmentClick }) {
         endDate = format(addWeeks(weekStart, 1), 'yyyy-MM-dd')
       }
 
-      let url = `/appointments/by-range?start=${startDate}&end=${endDate}`
+      let url = `/appointments/by-range?start_date=${startDate}&end_date=${endDate}`
       if (selectedDentist !== 'all' && user?.role === 'admin') {
         url += `&dentist_id=${selectedDentist}`
       } else if (user?.role === 'dentista') {

@@ -73,13 +73,20 @@ class AppointmentController {
         throw new AppError('Cita no encontrada', 404);
       }
 
-      const { dentist_id, date, time } = req.body;
+      const { dentist_id, date, time, service_id } = req.body;
       if (dentist_id && date && time) {
+        let serviceDuration = appointment.duration;
+        if (service_id) {
+          const Service = require('../models/service.model');
+          const service = await Service.findById(service_id);
+          serviceDuration = service?.duration || serviceDuration;
+        }
         const isAvailable = await Appointment.checkAvailability(
-          dentist_id, 
-          date, 
-          time, 
-          parseInt(req.params.id)
+          dentist_id,
+          date,
+          time,
+          serviceDuration,
+          appointment.id
         );
         if (!isAvailable) {
           throw new AppError('El horario no está disponible', 400);
