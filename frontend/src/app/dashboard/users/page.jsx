@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/context/AuthContext'
-import { formatRut, validateRut, cleanRut } from '@/utils/rut'
+import { formatRut, validateRut, cleanRut, formatPhone } from '@/utils/rut'
 
 export default function UsersPage() {
   const { api, user } = useAuth()
@@ -85,6 +85,8 @@ export default function UsersPage() {
       } else {
         setRutError('')
       }
+    } else if (name === 'phone') {
+      setFormData({ ...formData, phone: formatPhone(value) })
     } else {
       setFormData({ ...formData, [name]: value })
     }

@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext'
 import Link from 'next/link'
 import { format, addDays, isToday } from 'date-fns'
 import { es } from 'date-fns/locale'
-import { formatRut, validateRut, cleanRut } from '@/utils/rut'
+import { formatRut, validateRut, cleanRut, formatPhone } from '@/utils/rut'
 
 export default function AppointmentPage() {
   const { api } = useAuth()
@@ -100,6 +100,8 @@ export default function AppointmentPage() {
       } else {
         setRutError('')
       }
+    } else if (name === 'phone') {
+      setPatientData({ ...patientData, phone: formatPhone(value) })
     } else {
       setPatientData({ ...patientData, [name]: value })
     }
@@ -509,7 +511,7 @@ export default function AppointmentPage() {
                     <label className="block text-sm font-semibold text-slate-700 mb-1.5">Teléfono *</label>
                     <input type="tel" name="phone" required value={patientData.phone} onChange={handlePatientChange}
                       className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-colors outline-none"
-                      placeholder="+52 55 1234 5678" />
+                      placeholder="+56 9 1234 5678" />
                   </div>
                 </div>
 
