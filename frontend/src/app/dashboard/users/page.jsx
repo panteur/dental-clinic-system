@@ -11,6 +11,7 @@ export default function UsersPage() {
   const [editingUser, setEditingUser] = useState(null)
   const [saving, setSaving] = useState(false)
   const [formData, setFormData] = useState({
+    rut: '',
     name: '',
     email: '',
     password: '',
@@ -18,6 +19,7 @@ export default function UsersPage() {
     phone: '',
     specialty: ''
   })
+  const [search, setSearch] = useState('')
 
   const isAdmin = user?.role === 'admin'
 
@@ -25,10 +27,11 @@ export default function UsersPage() {
     loadUsers()
   }, [])
 
-  const loadUsers = async () => {
+  const loadUsers = async (searchQuery = '') => {
     setLoading(true)
     try {
-      const res = await api.get('/users')
+      const params = searchQuery ? `?search=${encodeURIComponent(searchQuery)}` : ''
+      const res = await api.get(`/users${params}`)
       setUsers(res.data.users || [])
     } catch (err) {
       console.error('Error loading users:', err)
@@ -36,15 +39,23 @@ export default function UsersPage() {
     setLoading(false)
   }
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      loadUsers(search)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [search])
+
   const openCreateModal = () => {
     setEditingUser(null)
-    setFormData({ name: '', email: '', password: '', role: 'dentista', phone: '', specialty: '' })
+    setFormData({ rut: '', name: '', email: '', password: '', role: 'dentista', phone: '', specialty: '' })
     setShowModal(true)
   }
 
   const openEditModal = (userData) => {
     setEditingUser(userData)
     setFormData({
+      rut: userData.rut || '',
       name: userData.name,
       email: userData.email,
       password: '',
@@ -60,6 +71,7 @@ export default function UsersPage() {
     setSaving(true)
     try {
       const data = {
+        rut: formData.rut || null,
         name: formData.name,
         email: formData.email,
         role: formData.role,
@@ -143,6 +155,21 @@ export default function UsersPage() {
         </button>
       </div>
 
+      <div className="mb-4">
+        <div className="relative max-w-md">
+          <input
+            type="text"
+            placeholder="Buscar por nombre, email o RUT..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
+          />
+          <svg className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+      </div>
+
       {/* Users Table */}
       <div className="bg-white rounded-xl shadow-sm">
         <div className="p-6">
@@ -155,6 +182,7 @@ export default function UsersPage() {
               <table className="w-full">
                 <thead>
                   <tr className="text-left text-sm text-gray-500 border-b">
+                    <th className="pb-3 font-medium">RUT</th>
                     <th className="pb-3 font-medium">Nombre</th>
                     <th className="pb-3 font-medium">Email</th>
                     <th className="pb-3 font-medium">Rol</th>
@@ -168,6 +196,7 @@ export default function UsersPage() {
                     const badge = getRoleBadge(u.role)
                     return (
                       <tr key={u.id}>
+                        <td className="py-4 text-gray-600">{u.rut || '-'}</td>
                         <td className="py-4 font-medium text-gray-900">{u.name}</td>
                         <td className="py-4 text-gray-600">{u.email}</td>
                         <td className="py-4">
@@ -231,6 +260,19 @@ export default function UsersPage() {
               </h2>
             </div>
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  RUT
+                </label>
+                <input
+                  type="text"
+                  value={formData.rut}
+                  onChange={(e) => setFormData({ ...formData, rut: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  placeholder="Ej: 12.345.678-5"
+                />
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Nombre *

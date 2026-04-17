@@ -5,9 +5,10 @@ class User {
   static async create(userData) {
     const hashedPassword = await bcrypt.hash(userData.password, 10);
     const result = await query(
-      `INSERT INTO users (email, password, name, role, phone, specialty, created_at) 
-       VALUES (?, ?, ?, ?, ?, ?, NOW())`,
+      `INSERT INTO users (rut, email, password, name, role, phone, specialty, created_at) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, NOW())`,
       [
+        userData.rut || null,
         userData.email,
         hashedPassword,
         userData.name,
@@ -20,7 +21,7 @@ class User {
   }
 
   static async findById(id) {
-    const users = await query('SELECT id, email, name, role, phone, specialty, created_at FROM users WHERE id = ?', [id]);
+    const users = await query('SELECT id, rut, email, name, role, phone, specialty, created_at FROM users WHERE id = ?', [id]);
     return users[0] || null;
   }
 
@@ -30,7 +31,7 @@ class User {
   }
 
   static async findAll(filters = {}) {
-    let sql = 'SELECT id, email, name, role, phone, specialty, created_at FROM users WHERE 1=1';
+    let sql = 'SELECT id, rut, email, name, role, phone, specialty, created_at FROM users WHERE 1=1';
     const params = [];
 
     if (filters.role) {
@@ -39,8 +40,8 @@ class User {
     }
 
     if (filters.search) {
-      sql += ' AND (name LIKE ? OR email LIKE ?)';
-      params.push(`%${filters.search}%`, `%${filters.search}%`);
+      sql += ' AND (name LIKE ? OR email LIKE ? OR rut LIKE ?)';
+      params.push(`%${filters.search}%`, `%${filters.search}%`, `%${filters.search}%`);
     }
 
     sql += ' ORDER BY created_at DESC';
@@ -57,6 +58,10 @@ class User {
     const updates = [];
     const params = [];
 
+    if (userData.rut !== undefined) {
+      updates.push('rut = ?');
+      params.push(userData.rut || null);
+    }
     if (userData.name) {
       updates.push('name = ?');
       params.push(userData.name);

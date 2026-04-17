@@ -153,6 +153,13 @@ const seedData = [
       ADD COLUMN reset_expires DATETIME NULL,
       ADD INDEX idx_reset_token (reset_token);
     `
+  },
+  {
+    name: 'add_rut_to_users',
+    sql: `
+      ALTER TABLE users ADD COLUMN rut VARCHAR(20) NULL UNIQUE,
+      ADD INDEX idx_rut (rut);
+    `
   }
 ];
 

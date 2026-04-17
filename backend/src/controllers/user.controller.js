@@ -31,7 +31,11 @@ class UserController {
       res.status(201).json({ message: 'Usuario creado', user });
     } catch (error) {
       if (error.code === 'ER_DUP_ENTRY') {
-        next(new AppError('El email ya está registrado', 400));
+        if (error.message.includes('rut')) {
+          next(new AppError('El RUT ya está registrado', 400));
+        } else {
+          next(new AppError('El email ya está registrado', 400));
+        }
       } else {
         next(error);
       }

@@ -19,6 +19,7 @@ router.get('/:id',
 router.post('/',
   isAdmin,
   validate([
+    body('rut').optional().trim(),
     body('email').isEmail().normalizeEmail(),
     body('password').isLength({ min: 6 }),
     body('name').trim().notEmpty(),
