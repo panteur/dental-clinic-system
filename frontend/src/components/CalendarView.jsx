@@ -19,7 +19,7 @@ import { es } from 'date-fns/locale'
 
 const STATUS_COLORS = {
   pendiente: 'bg-yellow-500',
-  confirmada: 'bg-blue-500',
+  confirmada: 'bg-green-500',
   completada: 'bg-green-500',
   cancelada: 'bg-red-500',
   no_presento: 'bg-gray-400'
@@ -27,7 +27,7 @@ const STATUS_COLORS = {
 
 const STATUS_BG = {
   pendiente: 'bg-yellow-50 border-yellow-200',
-  confirmada: 'bg-blue-50 border-blue-200',
+  confirmada: 'bg-green-50 border-green-200',
   completada: 'bg-green-50 border-green-200',
   cancelada: 'bg-red-50 border-red-200',
   no_presento: 'bg-gray-50 border-gray-200'
@@ -35,7 +35,7 @@ const STATUS_BG = {
 
 const STATUS_TEXT = {
   pendiente: 'text-yellow-700',
-  confirmada: 'text-blue-700',
+  confirmada: 'text-green-700',
   completada: 'bg-green-700',
   cancelada: 'text-red-700',
   no_presento: 'text-gray-600'
@@ -43,7 +43,7 @@ const STATUS_TEXT = {
 
 const STATUS_BADGE = {
   pendiente: 'bg-yellow-100 text-yellow-800',
-  confirmada: 'bg-blue-100 text-blue-800',
+  confirmada: 'bg-green-100 text-green-800',
   completada: 'bg-green-100 text-green-800',
   cancelada: 'bg-red-100 text-red-800',
   no_presento: 'bg-gray-100 text-gray-600'
