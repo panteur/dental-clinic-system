@@ -59,7 +59,11 @@ class AppointmentController {
       });
 
       const appointment = await Appointment.findById(appointmentId);
-      emailService.sendAppointmentConfirmation(appointment, appointment);
+      emailService.sendAppointmentConfirmation(appointment, {
+        name: appointment.patient_name,
+        last_name: appointment.patient_last_name,
+        email: appointment.patient_email
+      });
       res.status(201).json({ message: 'Cita creada', appointment });
     } catch (error) {
       next(error);
@@ -97,7 +101,11 @@ class AppointmentController {
       const updatedAppointment = await Appointment.findById(req.params.id);
 
       if (req.body.date || req.body.time) {
-        emailService.sendAppointmentReschedule(updatedAppointment, updatedAppointment);
+        emailService.sendAppointmentReschedule(updatedAppointment, {
+          name: updatedAppointment.patient_name,
+          last_name: updatedAppointment.patient_last_name,
+          email: updatedAppointment.patient_email
+        });
       }
 
       res.json({ message: 'Cita actualizada', appointment: updatedAppointment });
@@ -124,7 +132,11 @@ class AppointmentController {
       const updatedAppointment = await Appointment.findById(req.params.id);
 
       if (status === STATUS.CANCELLED) {
-        emailService.sendAppointmentCancellation(updatedAppointment, updatedAppointment);
+        emailService.sendAppointmentCancellation(updatedAppointment, {
+          name: updatedAppointment.patient_name,
+          last_name: updatedAppointment.patient_last_name,
+          email: updatedAppointment.patient_email
+        });
       }
 
       res.json({ message: 'Estado actualizado', appointment: updatedAppointment });
