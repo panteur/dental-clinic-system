@@ -38,14 +38,15 @@ export function formatPhone(value) {
   if (!value) return '+56 '
   const cleaned = value.replace(/[^0-9]/g, '')
   if (!cleaned) return '+56 '
-  if (cleaned.startsWith('56')) {
+  if (cleaned.startsWith('56') && cleaned.length >= 10) {
     const num = cleaned.slice(2)
-    if (num.length <= 4) return `+56 ${num}`
-    if (num.length <= 8) return `+56 ${num.slice(0, 4)} ${num.slice(4)}`
-    return `+56 ${num.slice(0, 4)} ${num.slice(4, 8)} ${num.slice(8, 11)}`
+    if (num.length === 9) {
+      return `+56 9 ${num.slice(1, 5)} ${num.slice(5)}`
+    }
+    return `+56 ${num}`
   }
-  if (cleaned.startsWith('9') && cleaned.length <= 9) {
-    return `+56 ${cleaned}`
+  if (cleaned.startsWith('9') && cleaned.length === 9) {
+    return `+56 9 ${cleaned.slice(1, 5)} ${cleaned.slice(5)}`
   }
   return `+56 ${cleaned}`
 }
