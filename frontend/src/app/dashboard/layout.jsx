@@ -16,6 +16,85 @@ const navItems = [
   { href: '/dashboard/users', label: 'Usuarios', icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 6v1h8v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z', adminOnly: true },
 ]
 
+function Logo({ collapsed = false }) {
+  return (
+    <Link href="/" className="flex items-center gap-3 group">
+      <div className="w-10 h-10 bg-gradient-to-br from-sky-500 to-sky-700 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-sky-500/25 group-hover:shadow-sky-500/40 transition-shadow">
+        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+      </div>
+      {!collapsed && (
+        <div>
+          <span className="text-lg font-extrabold text-slate-900 tracking-tight">DentalCare</span>
+          <span className="block text-[10px] font-medium text-slate-400 -mt-0.5 tracking-wide uppercase">Clínica Dental</span>
+        </div>
+      )}
+    </Link>
+  )
+}
+
+function NavItem({ item, isActive, collapsed }) {
+  return (
+    <Link
+      href={item.href}
+      className={`relative flex items-center gap-3 px-4 py-2.5 mx-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+        isActive
+          ? 'bg-sky-50 text-sky-700 shadow-sm shadow-sky-100'
+          : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'
+      }`}
+      title={collapsed ? item.label : ''}
+    >
+      {isActive && (
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-sky-600 rounded-r-full" />
+      )}
+      <svg className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-sky-600' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={isActive ? 2 : 1.5} d={item.icon} />
+      </svg>
+      {!collapsed && <span className="truncate">{item.label}</span>}
+    </Link>
+  )
+}
+
+function UserProfile({ user, collapsed, onLogout }) {
+  const roleLabels = { admin: 'Administrador', dentista: 'Dentista', recepcionista: 'Recepcionista' }
+  const roleColors = {
+    admin: 'bg-violet-100 text-violet-600',
+    dentista: 'bg-sky-100 text-sky-600',
+    recepcionista: 'bg-emerald-100 text-emerald-600',
+  }
+
+  return (
+    <div className="p-4">
+      {!collapsed && (
+        <div className="mb-3 bg-slate-50 rounded-xl p-3 border border-slate-100">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-sky-500 to-sky-700 text-white flex items-center justify-center font-bold text-xs flex-shrink-0 shadow-sm">
+              {user.name?.split(' ').map(n => n[0]).join('').slice(0, 2)}
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-slate-800 truncate">{user.name}</p>
+              <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold mt-0.5 ${roleColors[user.role] || 'bg-slate-100 text-slate-600'}`}>
+                {roleLabels[user.role] || user.role}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+      <button
+        onClick={onLogout}
+        className={`flex items-center gap-2 px-3 py-2.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all duration-200 text-sm font-medium w-full ${collapsed ? 'justify-center' : ''}`}
+        title={collapsed ? 'Cerrar Sesión' : ''}
+      >
+        <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+        </svg>
+        {!collapsed && <span>Cerrar Sesión</span>}
+      </button>
+    </div>
+  )
+}
+
 export default function DashboardLayout({ children }) {
   const { user, loading, logout } = useAuth()
   const router = useRouter()
@@ -44,32 +123,35 @@ export default function DashboardLayout({ children }) {
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-600 border-t-transparent"></div>
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-10 h-10 bg-gradient-to-br from-sky-500 to-sky-700 rounded-xl flex items-center justify-center shadow-lg shadow-sky-500/25">
+            <svg className="w-6 h-6 text-white animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+          </div>
+          <div className="animate-spin rounded-full h-6 w-6 border-2 border-sky-600 border-t-transparent"></div>
+        </div>
       </div>
     )
   }
 
+  const handleLogout = () => { logout(); router.push('/login') }
   const sidebarWidth = collapsed ? 'w-20' : 'w-64'
   const mainMargin = collapsed ? 'md:ml-20' : 'md:ml-64'
 
+  const filteredNav = navItems.filter(item => !item.adminOnly || user?.role === 'admin')
+
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-slate-50">
       {/* Mobile Header */}
-      <header className="md:hidden fixed top-0 left-0 right-0 h-16 bg-gray-900 text-white z-40 flex items-center justify-between px-4">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-            </svg>
-          </div>
-          <span className="font-semibold">DentalCare</span>
-        </Link>
+      <header className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 z-40 flex items-center justify-between px-4 shadow-sm">
+        <Logo />
         <button
           onClick={() => setMobileOpen(true)}
-          className="p-2 hover:bg-gray-800 rounded-lg"
+          className="p-2.5 hover:bg-slate-100 rounded-xl transition-colors"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
@@ -77,137 +159,69 @@ export default function DashboardLayout({ children }) {
 
       {/* Mobile Overlay */}
       {mobileOpen && (
-        <div 
-          className="md:hidden fixed inset-0 bg-black/50 z-40"
+        <div
+          className="md:hidden fixed inset-0 bg-slate-900/30 backdrop-blur-sm z-40"
           onClick={() => setMobileOpen(false)}
         />
       )}
 
       {/* Mobile Sidebar */}
-      <aside className={`md:hidden fixed top-0 left-0 h-full w-64 bg-gray-900 text-white z-50 transform transition-transform duration-300 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="p-4 flex justify-between items-center border-b border-gray-800">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-              </svg>
-            </div>
-            <span className="font-semibold">DentalCare</span>
-          </Link>
-          <button onClick={() => setMobileOpen(false)} className="p-2 hover:bg-gray-800 rounded-lg">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <aside className={`md:hidden fixed top-0 left-0 h-full w-72 bg-white z-50 shadow-2xl shadow-slate-900/10 transform transition-transform duration-300 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="p-5 flex justify-between items-center border-b border-slate-100">
+          <Logo />
+          <button onClick={() => setMobileOpen(false)} className="p-2 hover:bg-slate-100 rounded-xl transition-colors">
+            <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        <nav className="mt-4">
-          {navItems.map((item) => {
-            if (item.adminOnly && user?.role !== 'admin') return null
-            const isActive = pathname === item.href
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-3 px-6 py-3 transition ${
-                  isActive
-                    ? 'bg-primary-600 text-white'
-                    : 'text-gray-300 hover:bg-gray-800'
-                }`}
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
-                </svg>
-                {item.label}
-              </Link>
-            )
-          })}
+        <nav className="mt-4 space-y-1">
+          {filteredNav.map((item) => (
+            <NavItem key={item.href} item={item} isActive={pathname === item.href} collapsed={false} />
+          ))}
         </nav>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-800">
-          <div className="mb-3">
-            <p className="text-sm font-medium">{user.name}</p>
-            <p className="text-xs text-gray-400 capitalize">{user.role}</p>
-          </div>
-          <button
-            onClick={() => { logout(); router.push('/login') }}
-            className="w-full flex items-center gap-2 px-4 py-2 text-gray-300 hover:bg-gray-800 rounded-lg transition"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-            Cerrar Sesión
-          </button>
+        <div className="absolute bottom-0 left-0 right-0 border-t border-slate-100">
+          <UserProfile user={user} collapsed={false} onLogout={handleLogout} />
         </div>
       </aside>
 
       {/* Desktop Sidebar */}
-      <aside className={`hidden md:block fixed left-0 top-0 h-full ${sidebarWidth} bg-gray-900 text-white transition-all duration-300 z-30`}>
-        <div className="p-4 lg:p-6">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-              </svg>
-            </div>
-            {!collapsed && <span className="text-xl font-semibold">DentalCare</span>}
-          </Link>
+      <aside className={`hidden md:flex md:flex-col fixed left-0 top-0 h-full ${sidebarWidth} bg-white border-r border-slate-200/60 transition-all duration-300 z-30`}>
+        {/* Logo */}
+        <div className="p-5 flex-shrink-0">
+          <Logo collapsed={collapsed} />
         </div>
 
+        {/* Collapse toggle */}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="hidden md:flex absolute top-6 -right-3 w-6 h-6 bg-gray-700 rounded-full items-center justify-center hover:bg-gray-600 transition"
+          className="absolute top-7 -right-3 w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm"
         >
-          <svg className={`w-4 h-4 transition-transform ${collapsed ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className={`w-3.5 h-3.5 text-slate-400 transition-transform ${collapsed ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
 
-        <nav className="mt-2">
-          {navItems.map((item) => {
-            if (item.adminOnly && user?.role !== 'admin') return null
-            const isActive = pathname === item.href
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-3 px-4 lg:px-6 py-3 transition ${
-                  isActive
-                    ? 'bg-primary-600 text-white'
-                    : 'text-gray-300 hover:bg-gray-800'
-                }`}
-                title={collapsed ? item.label : ''}
-              >
-                <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
-                </svg>
-                {!collapsed && <span className="truncate">{item.label}</span>}
-              </Link>
-            )
-          })}
+        {/* Navigation */}
+        <nav className="mt-2 flex-1 space-y-1 overflow-y-auto">
+          {filteredNav.map((item) => (
+            <NavItem key={item.href} item={item} isActive={pathname === item.href} collapsed={collapsed} />
+          ))}
         </nav>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 lg:p-6 border-t border-gray-800">
-          <div className={`mb-3 ${collapsed ? 'hidden' : ''}`}>
-            <p className="text-sm font-medium truncate">{user.name}</p>
-            <p className="text-xs text-gray-400 capitalize">{user.role}</p>
-          </div>
-          <button
-            onClick={() => { logout(); router.push('/login') }}
-            className={`flex items-center gap-2 px-4 py-2 text-gray-300 hover:bg-gray-800 rounded-lg transition ${collapsed ? 'justify-center' : ''}`}
-            title={collapsed ? 'Cerrar Sesión' : ''}
-          >
-            <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-            {!collapsed && <span className="text-sm">Cerrar Sesión</span>}
-          </button>
+        {/* User Profile */}
+        <div className="border-t border-slate-100 flex-shrink-0">
+          <UserProfile user={user} collapsed={collapsed} onLogout={handleLogout} />
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className={`pt-16 md:pt-0 p-4 md:p-8 ${mainMargin} transition-all duration-300`}>
-        {children}
+      <main className={`pt-16 md:pt-0 ${mainMargin} transition-all duration-300`}>
+        <div className="p-4 md:p-8 max-w-7xl">
+          {children}
+        </div>
       </main>
     </div>
   )

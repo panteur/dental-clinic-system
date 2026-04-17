@@ -32,7 +32,7 @@ function StatusBadge({ status }) {
 
 function StatCard({ label, value, icon, color }) {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 hover:shadow-md transition-shadow">
+    <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 p-6 hover:shadow-2xl hover:shadow-slate-200/60 hover:-translate-y-0.5 transition-all duration-300">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-slate-500">{label}</p>
@@ -337,8 +337,8 @@ function AdminDashboard({ api }) {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-900">Panel de Administración</h1>
-        <p className="text-slate-500 mt-1">Resumen del sistema y gestión de usuarios</p>
+        <h1 className="text-2xl font-extrabold text-slate-900">Panel de Administración</h1>
+        <p className="text-slate-400 mt-1">Resumen del sistema y gestión de usuarios</p>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -368,7 +368,7 @@ function AdminDashboard({ api }) {
         />
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100">
+      <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100">
         <div className="p-6 border-b border-slate-100 flex items-center justify-between">
           <h2 className="text-lg font-bold text-slate-900">Usuarios del Sistema</h2>
           <Link href="/dashboard/users" className="text-sm text-sky-600 hover:text-sky-700 font-medium flex items-center gap-1">
@@ -504,8 +504,8 @@ function DentistDashboard({ api, user }) {
       )}
 
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-900">Mi Agenda</h1>
-        <p className="text-slate-500 mt-1">Citas y disponibilidad para los próximos días</p>
+        <h1 className="text-2xl font-extrabold text-slate-900">Mi Agenda</h1>
+        <p className="text-slate-400 mt-1">Citas y disponibilidad para los próximos días</p>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -523,7 +523,7 @@ function DentistDashboard({ api, user }) {
         />
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 mb-6">
+      <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 mb-6">
         <div className="p-4 border-b border-slate-100">
           <h2 className="text-sm font-bold text-slate-900">Selecciona un día</h2>
         </div>
@@ -558,7 +558,7 @@ function DentistDashboard({ api, user }) {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100">
+      <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100">
         <div className="p-6 border-b border-slate-100 flex items-center justify-between">
           <h2 className="text-lg font-bold text-slate-900">
             Citas del {format(selectedDate, "d 'de' MMMM yyyy", { locale: es })}
@@ -716,8 +716,8 @@ function ReceptionistDashboard({ api }) {
       )}
 
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-900">Gestión de Citas</h1>
-        <p className="text-slate-500 mt-1">Todas las reservas activas y pendientes</p>
+        <h1 className="text-2xl font-extrabold text-slate-900">Gestión de Citas</h1>
+        <p className="text-slate-400 mt-1">Todas las reservas activas y pendientes</p>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -735,7 +735,7 @@ function ReceptionistDashboard({ api }) {
         />
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100">
+      <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100">
         <div className="p-4 border-b border-slate-100 flex flex-wrap gap-2">
           {filterOptions.map(opt => (
             <button
