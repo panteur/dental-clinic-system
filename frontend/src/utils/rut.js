@@ -35,23 +35,24 @@ export function cleanRut(rut) {
 }
 
 export function formatPhone(value) {
-  if (!value) return '+56 '
+  if (!value) return ''
   const cleaned = value.replace(/[^0-9]/g, '')
-  if (!cleaned) return '+56 '
-  if (cleaned.startsWith('56') && cleaned.length >= 10) {
-    const num = cleaned.slice(2)
-    if (num.length === 9) {
-      return `+56 9 ${num.slice(1, 5)} ${num.slice(5)}`
-    }
-    return `+56 ${num}`
+  if (!cleaned) return ''
+  if (cleaned.length <= 9) {
+    if (cleaned.length <= 4) return cleaned
+    if (cleaned.length <= 8) return `${cleaned.slice(0, 4)} ${cleaned.slice(4)}`
+    return `9 ${cleaned.slice(1, 5)} ${cleaned.slice(5)}`
   }
-  if (cleaned.startsWith('9') && cleaned.length === 9) {
-    return `+56 9 ${cleaned.slice(1, 5)} ${cleaned.slice(5)}`
-  }
-  return `+56 ${cleaned}`
+  const num = cleaned.slice(-9)
+  return `9 ${num.slice(1, 5)} ${num.slice(5)}`
 }
 
 export function cleanPhone(value) {
   if (!value) return ''
-  return value.replace(/[^0-9]/g, '')
+  return value.replace(/[^0-9]/g, '').slice(-9)
+}
+
+export function formatPhoneForDB(value) {
+  const cleaned = cleanPhone(value)
+  return `+56 ${cleaned}`
 }

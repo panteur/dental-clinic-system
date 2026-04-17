@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/context/AuthContext'
-import { formatRut, validateRut, cleanRut, formatPhone } from '@/utils/rut'
+import { formatRut, validateRut, cleanRut, formatPhone, formatPhoneForDB } from '@/utils/rut'
 
 export default function UsersPage() {
   const { api, user } = useAuth()
@@ -107,7 +107,7 @@ export default function UsersPage() {
         name: formData.name,
         email: formData.email,
         role: formData.role,
-        phone: formData.phone || null,
+        phone: formData.phone ? formatPhoneForDB(formData.phone) : null,
         specialty: formData.specialty || null
       }
 

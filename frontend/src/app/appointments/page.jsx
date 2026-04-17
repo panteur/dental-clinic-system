@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext'
 import Link from 'next/link'
 import { format, addDays, isToday } from 'date-fns'
 import { es } from 'date-fns/locale'
-import { formatRut, validateRut, cleanRut, formatPhone } from '@/utils/rut'
+import { formatRut, validateRut, cleanRut, formatPhone, formatPhoneForDB } from '@/utils/rut'
 
 export default function AppointmentPage() {
   const { api } = useAuth()
@@ -124,7 +124,7 @@ export default function AppointmentPage() {
         dni: patientData.dni || `TMP-${Date.now()}`,
         name: patientData.name,
         last_name: patientData.last_name,
-        phone: patientData.phone,
+        phone: formatPhoneForDB(patientData.phone),
         email: patientData.email || null,
         dentist_id: selectedDentist,
         service_id: selectedService,
