@@ -298,7 +298,7 @@ export default function AppointmentPage() {
                   {services.map((service) => (
                     <button
                       key={service.id}
-                      onClick={() => { setSelectedService(service.id); setSelectedTime(null); loadSlots }}
+                      onClick={() => { setSelectedService(service.id); setSelectedTime(null) }}
                       className={`p-4 border-2 rounded-xl cursor-pointer transition-all text-left ${
                         selectedService === service.id 
                           ? 'border-sky-500 bg-sky-50 shadow-md' 
@@ -363,7 +363,7 @@ export default function AppointmentPage() {
                   {dates.map((date) => (
                     <button
                       key={date.toISOString()}
-                      onClick={() => { setSelectedDate(date); setSelectedTime(null) }}
+                      onClick={() => { setSelectedDate(date); setSelectedTime(null); setAvailableSlots([]) }}
                       className={`p-3 rounded-xl text-center transition-all ${
                         selectedDate?.toDateString() === date.toDateString()
                           ? 'bg-sky-600 text-white shadow-lg shadow-sky-500/30'
